@@ -1,98 +1,47 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Transition } from 'react-transition-group';
 import './widget.scss';
+import axios from 'axios';
 
 class Widget extends Component {
-  state = {
-    opened: false,
-    showDock: true,
-  }
-
-  handleToggleOpen = () => {
-    this.setState((prev) => {
-      let { showDock } = prev;
-      if (!prev.opened) {
-        showDock = false;
-      }
-      return {
-        showDock,
-        opened: !prev.opened,
-      };
+  // 
+  // state = {
+  //   customer_id: null
+  // }
+  
+  componentDidMount() {
+    axios.post("http://localhost:8080/customer",{
+    })
+    .then(response => {
+      console.log(response.data);
+    })
+    .catch(err => {
+      console.log(err);
     });
-  }
-
-  handleWidgetExit = () => {
-    this.setState({
-      showDock: true,
-    });
-  }
-
-  renderBody = () => {
-    const { showDock } = this.state;
-
-    if (!showDock) return '';
-
-    return (
-      <button
-        type="button"
-        className="dock"
-        onClick={this.handleToggleOpen}
-        onKeyPress={this.handleToggleOpen}
-      >
-        ^ OPEN ^
-      </button>
-    );
-  }
+  };
 
   render() {
-    const { opened } = this.state;
-    const body = this.renderBody();
-    const { bodyText, headerText, footerText } = this.props;
-
+    
+    const {userId} = this.props;
+    
+    console.log(userId);
+    
     return (
       <div className="docked-widget">
-        <Transition in={opened} timeout={250} onExited={this.handleWidgetExit}>
-          {status => (
-            <div className={`widget widget-${status}`}>
-              <div className="widget-header">
-                <div className="widget-header-title">
-                  {headerText}
-                </div>
-                <button
-                  type="button"
-                  className="widget-header-icon"
-                  onClick={this.handleToggleOpen}
-                  onKeyPress={this.handleToggleOpen}
-                >
-                  X
-                </button>
-              </div>
-              <div className="widget-body">
-                {bodyText}
-              </div>
-              <div className="widget-footer">
-                {footerText}
-              </div>
-            </div>
-          )}
-        </Transition>
-        {body}
+        <div className="widget-body">
+          <p>This will be the widget!</p>
+        </div>
       </div>
     );
   }
 }
 
 Widget.propTypes = {
-  headerText: PropTypes.string,
-  bodyText: PropTypes.string,
-  footerText: PropTypes.string,
+  userId: PropTypes.number
 };
 
 Widget.defaultProps = {
-  headerText: 'Header',
-  bodyText: 'Body',
-  footerText: 'Footer',
+  userId: '0',
 };
 
 export default Widget;
