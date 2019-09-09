@@ -2,14 +2,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import './widget.scss';
 import axios from 'axios';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+var cookieJar = cookies.get('customer_id');
+
+// cookies.remove('customer_id');
 
 class Widget extends Component {
-  
+
   state = {
     customer_id: null
   }
   
   componentDidMount() {
+    if (cookieJar === undefined) {
       axios.post("http://localhost:8080/customer",{
       })
       .then(response => {
@@ -18,6 +26,7 @@ class Widget extends Component {
       .catch(err => {
         console.log(err);
       });  
+    }
   };
 
   render() {
@@ -33,6 +42,8 @@ class Widget extends Component {
       .catch(err => {
         console.log(err);
       });
+      
+      cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+3600)});
     }
     
     return (
