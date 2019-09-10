@@ -41,6 +41,7 @@ class Widget extends Component {
         console.log(response);
       })
       .catch(err => {
+        console.log("hi!");
         console.log(err);
       });
       
