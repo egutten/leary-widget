@@ -7,6 +7,7 @@ import Cookies from 'universal-cookie';
 const cookies = new Cookies();
 
 var cookieJar = cookies.get('customer_id');
+console.log(cookies.get('customer_id'))
 
 // cookies.remove('customer_id');
 
@@ -43,7 +44,7 @@ class Widget extends Component {
         console.log(err);
       });
       
-      cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+3600)});
+      cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+2592000)});
     }
     
     return (
