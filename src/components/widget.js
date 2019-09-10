@@ -1,98 +1,68 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Transition } from 'react-transition-group';
 import './widget.scss';
+import axios from 'axios';
+import Cookies from 'universal-cookie';
+
+const cookies = new Cookies();
+
+var cookieJar = cookies.get('customer_id');
+console.log(cookies.get('customer_id'))
+
+// cookies.remove('customer_id');
 
 class Widget extends Component {
+
   state = {
-    opened: false,
-    showDock: true,
+    customer_id: null
   }
-
-  handleToggleOpen = () => {
-    this.setState((prev) => {
-      let { showDock } = prev;
-      if (!prev.opened) {
-        showDock = false;
-      }
-      return {
-        showDock,
-        opened: !prev.opened,
-      };
-    });
-  }
-
-  handleWidgetExit = () => {
-    this.setState({
-      showDock: true,
-    });
-  }
-
-  renderBody = () => {
-    const { showDock } = this.state;
-
-    if (!showDock) return '';
-
-    return (
-      <button
-        type="button"
-        className="dock"
-        onClick={this.handleToggleOpen}
-        onKeyPress={this.handleToggleOpen}
-      >
-        ^ OPEN ^
-      </button>
-    );
-  }
+  
+  componentDidMount() {
+    if (cookieJar === undefined) {
+      axios.post("http://localhost:8080/customer",{
+      })
+      .then(response => {
+        this.setState({customer_id: response.data.id});
+      })
+      .catch(err => {
+        console.log(err);
+      });  
+    }
+  };
 
   render() {
-    const { opened } = this.state;
-    const body = this.renderBody();
-    const { bodyText, headerText, footerText } = this.props;
-
+    if (this.state.customer_id !== null) {
+      axios.post("http://localhost:8080/customer-activity",{
+        user_id: this.props.userId,
+        customer_id: this.state.customer_id,
+        event: 'view'
+      })
+      .then(response => {
+        console.log(response);
+      })
+      .catch(err => {
+        console.log(err);
+      });
+      
+      cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+2592000)});
+    }
+    
     return (
       <div className="docked-widget">
-        <Transition in={opened} timeout={250} onExited={this.handleWidgetExit}>
-          {status => (
-            <div className={`widget widget-${status}`}>
-              <div className="widget-header">
-                <div className="widget-header-title">
-                  {headerText}
-                </div>
-                <button
-                  type="button"
-                  className="widget-header-icon"
-                  onClick={this.handleToggleOpen}
-                  onKeyPress={this.handleToggleOpen}
-                >
-                  X
-                </button>
-              </div>
-              <div className="widget-body">
-                {bodyText}
-              </div>
-              <div className="widget-footer">
-                {footerText}
-              </div>
-            </div>
-          )}
-        </Transition>
-        {body}
+        <div className="widget-body">
+          <p>This will be the widget!</p>
+        </div>
       </div>
     );
   }
 }
 
 Widget.propTypes = {
-  headerText: PropTypes.string,
-  bodyText: PropTypes.string,
-  footerText: PropTypes.string,
+  userId: PropTypes.number
 };
 
 Widget.defaultProps = {
-  headerText: 'Header',
-  bodyText: 'Body',
-  footerText: 'Footer',
+  userId: 0,
 };
 
 export default Widget;
