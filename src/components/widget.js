@@ -14,16 +14,24 @@ console.log(cookies.get('customer_id'))
 
 class Widget extends Component {
   state = {
-    customer_id: null,
     show: false,
-    conversion_event_id: null
+    conversion_event_text: null
   }
   
   componentDidMount() {
     if (cookieJar === undefined) {
       axios.post("http://localhost:8080/customer",{
       }).then(response => {
-        this.setState({customer_id: response.data.id});
+        axios.post("http://localhost:8080/customer-activity",{
+          user_id: this.props.userId,
+          customer_id: response.data.id,
+          event: 'view'
+        }).then(response => {
+          console.log(response);
+        }).catch(err => {
+          console.log(err);
+        });
+        cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
       }).catch(err => {
         console.log(err);
       });  
@@ -31,7 +39,13 @@ class Widget extends Component {
     
     axios.get("http://localhost:8080/conversion-event-id",{
     }).then(response => {
-      this.setState({conversion_event_id: response.data[0].conversion_event_id});
+      axios.post("http://localhost:8080/conversion-event-text",{
+        id: response.data[0].conversion_event_id
+      }).then(response => {
+       this.setState({conversion_event_text: response.data[0].conversion_event});
+      }).catch(err => {
+        console.log(err);
+      });
     }).catch(err => {
       console.log(err);
     });  
@@ -47,23 +61,9 @@ class Widget extends Component {
   
   render() {
     
-    if (this.state.customer_id !== null) {
-      axios.post("http://localhost:8080/customer-activity",{
-        user_id: this.props.userId,
-        customer_id: this.state.customer_id,
-        event: 'view'
-      }).then(response => {
-        console.log(response);
-      }).catch(err => {
-        console.log(err);
-      });
-      
-      cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+2592000)});
-    }
-    
     let message = null;
-    if (this.state.show && this.state.conversion_event_id !== null) {
-      message = <Message conversionEventId = {this.state.conversion_event_id}/>;
+    if (this.state.show) {
+      message = <Message conversionEvent = {this.state.conversion_event_text}/>;
     };
     
     return (
