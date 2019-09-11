@@ -2,7 +2,12 @@ import React from 'react';
 
 const message = (props) => (
   <div className="message-box">
-    <p className="event-text">{props.conversionEvent + "!"}</p>
+    <div className="logo">
+    </div>
+    <div>
+      <p className="event-text">{props.conversionEvent + "!"}</p>
+      <p className="time-stamp">{props.timeElapsed + " " + "minutes ago"}</p>
+    </div>
   </div> 
 );
 

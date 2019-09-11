@@ -8,14 +8,13 @@ import Message from './Message.js';
 const cookies = new Cookies();
 
 var cookieJar = cookies.get('customer_id');
-console.log(cookies.get('customer_id'))
-
-// cookies.remove('customer_id');
+console.log(cookies.get('customer_id'));
 
 class Widget extends Component {
   state = {
-    show: false,
-    conversion_event_text: null
+    show: true,
+    conversion_event_text: null,
+    time_stamp: null
   }
   
   componentDidMount() {
@@ -39,6 +38,18 @@ class Widget extends Component {
     
     axios.get("http://localhost:8080/conversion-event-id",{
     }).then(response => {
+      var created = response.data[0].createdAt
+      var sTime = created.split(/["T""."]/);
+      var year = sTime[0];
+      var yearTokens = year.split("-"); 
+      var milliYear = new Date(yearTokens[0], yearTokens[1] - 1, yearTokens[2]);
+      var time = sTime[1];
+      var timeTokens = time.split(":");
+      var milliTime = (((timeTokens[0]-7) * 3600000) + (timeTokens[1] * 60000) + (timeTokens[2] * 1000))
+      var milliseconds = milliYear.getTime() + milliTime;
+      var timeElapsed = (Math.round((Date.now() - milliseconds) / (1000 * 60) % 60));
+      this.setState({time_stamp: timeElapsed});
+      
       axios.post("http://localhost:8080/conversion-event-text",{
         id: response.data[0].conversion_event_id
       }).then(response => {
@@ -50,20 +61,19 @@ class Widget extends Component {
       console.log(err);
     });  
     
-    setTimeout(() => {
-      this.setState({show: true});
-    }, 2000)
-    
-    setTimeout(() => {
-      this.setState({show: false});
-    }, 6000);
+    // setTimeout(() => {
+    //   this.setState({show: true});
+    // }, 2000)
+    // 
+    // setTimeout(() => {
+    //   this.setState({show: false});
+    // }, 6000);
   };
   
   render() {
-    
     let message = null;
-    if (this.state.show) {
-      message = <Message conversionEvent = {this.state.conversion_event_text}/>;
+    if (this.state.show && this.state.conversion_event_text !== null) {
+      message = <Message conversionEvent = {this.state.conversion_event_text} timeElapsed = {this.state.time_stamp}/>;
     };
     
     return (
