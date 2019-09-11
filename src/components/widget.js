@@ -13,12 +13,10 @@ console.log(cookies.get('customer_id'))
 // cookies.remove('customer_id');
 
 class Widget extends Component {
-
   state = {
     customer_id: null,
     show: false,
-    conversion_event_id: null,
-    conversion_event: null
+    conversion_event_id: null
   }
   
   componentDidMount() {
@@ -38,12 +36,15 @@ class Widget extends Component {
       console.log(err);
     });  
     
-    
     setTimeout(() => {
       this.setState({show: true});
     }, 2000)
+    
+    setTimeout(() => {
+      this.setState({show: false});
+    }, 6000);
   };
-
+  
   render() {
     
     if (this.state.customer_id !== null) {
@@ -59,23 +60,10 @@ class Widget extends Component {
       
       cookies.set('customer_id', this.state.customer_id, {path: '/', expires: new Date(Date.now()+2592000)});
     }
-
-    if (this.state.conversion_event_id !== null) {
-      axios.post("http://localhost:8080/conversion-event-text",{
-        id: this.state.conversion_event_id
-      }).then(response => {
-       console.log(response.data[0].conversion_event);
-      }).catch(err => {
-        console.log(err);
-      });
-    }
     
     let message = null;
-    if (this.state.show) {
-      message = <Message />;
-      setTimeout(() => {
-        this.setState({show: false});
-      }, 4000)
+    if (this.state.show && this.state.conversion_event_id !== null) {
+      message = <Message conversionEventId = {this.state.conversion_event_id}/>;
     };
     
     return (
