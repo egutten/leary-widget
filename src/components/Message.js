@@ -3,7 +3,7 @@ import React from 'react';
 
 const message = (props) => (
   
-  <div className="message-box entering">
+  <div className={props.show}>
     <div className="logo">
     </div>
     <div className="text">

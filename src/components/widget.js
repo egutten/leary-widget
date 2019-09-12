@@ -12,7 +12,7 @@ console.log(cookies.get('customer_id'));
 
 class Widget extends Component {
   state = {
-    show: false,
+    show: "message-box hidden",
     conversion_event_text: null,
     timestamp: null
   }
@@ -52,18 +52,19 @@ class Widget extends Component {
     });  
     
     setTimeout(() => {
-      this.setState({show: true});
+      this.setState({show: "message-box entering"});
     }, 2000)
     
     setTimeout(() => {
-      this.setState({show: false});
-    }, 7000);
+      this.setState({show: "message-box exiting"});
+    }, 6000);
   };
   
   render() {
     let message = null;
-    if (this.state.show && this.state.conversion_event_text !== null) {
+    if (this.state.conversion_event_text !== null) {
       message = <Message 
+        show = {this.state.show}
         conversionEvent = {this.state.conversion_event_text} 
         timestamp = {this.state.timestamp} />;
     };
