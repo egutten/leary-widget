@@ -12,7 +12,7 @@ console.log(cookies.get('customer_id'));
 
 class Widget extends Component {
   state = {
-    // show: "message-box hidden",
+    show: "message-box hidden",
     conversion_event_text: null,
     timestamp: null,
     logo: null
@@ -58,7 +58,7 @@ class Widget extends Component {
       axios.post("http://localhost:8080/get-customer", {
         id: response.data.customer_id
       }).then(response => {
-        this.setState({logo: response.data[0].logo});
+        this.setState({logo: "https://logo.clearbit.com/" + response.data[0].logo});
       }).catch(err => {
         console.log(err);
       });
@@ -67,13 +67,13 @@ class Widget extends Component {
       console.log(err);
     });  
     
-    // setTimeout(() => {
-    //   this.setState({show: "message-box entering"});
-    // }, 2000)
-    // 
-    // setTimeout(() => {
-    //   this.setState({show: "message-box exiting"});
-    // }, 6000);
+    setTimeout(() => {
+      this.setState({show: "message-box entering"});
+    }, 2000)
+    
+    setTimeout(() => {
+      this.setState({show: "message-box exiting"});
+    }, 6000);
   };
   
   render() {
