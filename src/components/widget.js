@@ -14,7 +14,7 @@ class Widget extends Component {
   state = {
     show: false,
     conversion_event_text: null,
-    time_stamp: null
+    timestamp: null
   }
   
   componentDidMount() {
@@ -38,20 +38,10 @@ class Widget extends Component {
     
     axios.get("http://localhost:8080/conversion-event-id",{
     }).then(response => {
-      var created = response.data[0].createdAt
-      var sTime = created.split(/["T""."]/);
-      var year = sTime[0];
-      var yearTokens = year.split("-"); 
-      var milliYear = new Date(yearTokens[0], yearTokens[1] - 1, yearTokens[2]);
-      var time = sTime[1];
-      var timeTokens = time.split(":");
-      var milliTime = (((timeTokens[0]-7) * 3600000) + (timeTokens[1] * 60000) + (timeTokens[2] * 1000))
-      var milliseconds = milliYear.getTime() + milliTime;
-      var timeElapsed = (Math.round((Date.now() - milliseconds) / 60000));
-      this.setState({time_stamp: timeElapsed});
+      this.setState({timestamp: response.data.timestamp});
       
       axios.post("http://localhost:8080/conversion-event-text",{
-        id: response.data[0].conversion_event_id
+        id: response.data.conversion_event_id
       }).then(response => {
        this.setState({conversion_event_text: response.data[0].conversion_event});
       }).catch(err => {
@@ -71,12 +61,11 @@ class Widget extends Component {
   };
   
   render() {
-    
     let message = null;
     if (this.state.show && this.state.conversion_event_text !== null) {
       message = <Message 
         conversionEvent = {this.state.conversion_event_text} 
-        timeElapsed = {this.state.time_stamp} />;
+        timestamp = {this.state.timestamp} />;
     };
     
     return (

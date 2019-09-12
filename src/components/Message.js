@@ -8,7 +8,7 @@ const message = (props) => (
     </div>
     <div className="text">
       <p className="event-text">{props.conversionEvent + "!"}</p>
-      <p className="time-stamp">{props.timeElapsed + " " + "minutes ago"}</p>
+      <p className="time-stamp">{props.timestamp}</p>
     </div>
   </div> 
 );
