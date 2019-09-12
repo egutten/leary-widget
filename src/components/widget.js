@@ -12,7 +12,7 @@ console.log(cookies.get('customer_id'));
 
 class Widget extends Component {
   state = {
-    show: true,
+    show: false,
     conversion_event_text: null,
     time_stamp: null
   }
@@ -47,7 +47,7 @@ class Widget extends Component {
       var timeTokens = time.split(":");
       var milliTime = (((timeTokens[0]-7) * 3600000) + (timeTokens[1] * 60000) + (timeTokens[2] * 1000))
       var milliseconds = milliYear.getTime() + milliTime;
-      var timeElapsed = (Math.round((Date.now() - milliseconds) / (1000 * 60) % 60));
+      var timeElapsed = (Math.round((Date.now() - milliseconds) / 60000));
       this.setState({time_stamp: timeElapsed});
       
       axios.post("http://localhost:8080/conversion-event-text",{
@@ -61,19 +61,22 @@ class Widget extends Component {
       console.log(err);
     });  
     
-    // setTimeout(() => {
-    //   this.setState({show: true});
-    // }, 2000)
-    // 
-    // setTimeout(() => {
-    //   this.setState({show: false});
-    // }, 6000);
+    setTimeout(() => {
+      this.setState({show: true});
+    }, 2000)
+    
+    setTimeout(() => {
+      this.setState({show: false});
+    }, 7000);
   };
   
   render() {
+    
     let message = null;
     if (this.state.show && this.state.conversion_event_text !== null) {
-      message = <Message conversionEvent = {this.state.conversion_event_text} timeElapsed = {this.state.time_stamp}/>;
+      message = <Message 
+        conversionEvent = {this.state.conversion_event_text} 
+        timeElapsed = {this.state.time_stamp} />;
     };
     
     return (
