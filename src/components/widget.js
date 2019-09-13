@@ -20,10 +20,11 @@ class Widget extends Component {
   
   componentDidMount() {
     if (cookieJar === undefined) {
-      // enter blank customer into the system to get a customer_id
+      //Create customer on load
       axios.post("http://localhost:8080/customer",{
       }).then(response => {
-        // enter record that customer visited in customer activity
+        
+        //Create customer-acvitity (visit) on load
         axios.post("http://localhost:8080/customer-activity",{
           user_id: this.props.userId,
           customer_id: response.data.id,
@@ -33,40 +34,40 @@ class Widget extends Component {
         }).catch(err => {
           console.log(err);
         });
-        // set cookie for customer based on customer id created above
+        
+        //Set cookie for customer
         cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
       }).catch(err => {
         console.log(err);
       });  
     }
     
-    // access the time since the last conversion event
-    axios.get("http://localhost:8080/conversion-event-id",{
+    //Assembling all data to render a message
+    axios.post("http://localhost:8080/message", {
+      user_id: this.props.userId
     }).then(response => {
-      this.setState({timestamp: response.data.timestamp});
-      
-      // access the text of the last conversion event
-      axios.post("http://localhost:8080/conversion-event-text",{
-        id: response.data.conversion_event_id
-      }).then(response => {
-       this.setState({conversion_event_text: response.data[0].conversion_event});
-      }).catch(err => {
-        console.log(err);
+      this.setState({
+        conversion_event_text: response.data.conversion_event,
+        logo: "//logo.clearbit.com/" + response.data.logo,
+        timestamp: response.data.timestamp
       });
       
-      // access the logo of the customer of the last conversion conversion event 
-      axios.post("http://localhost:8080/get-customer", {
-        id: response.data.customer_id
+      //Record message logo that customer saw
+      axios.post("http://localhost:8080/customer-props", {
+        logo: response.data.logo,
+        customer_id: cookies.get('customer_id')
       }).then(response => {
-        this.setState({logo: "https://logo.clearbit.com/" + response.data[0].logo});
+        console.log(response);
       }).catch(err => {
         console.log(err);
-      });
+      })
       
+      console.log(response);
     }).catch(err => {
       console.log(err);
-    });  
+    });
     
+    //Set timeouts to make the message appear and disappear
     setTimeout(() => {
       this.setState({show: "message-box entering"});
     }, 2000)
