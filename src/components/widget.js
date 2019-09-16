@@ -43,7 +43,8 @@ class Widget extends Component {
     }
     
     //check that there is adequate data in the system to form a message
-    axios.get("http://localhost:8080/message-check", {
+    axios.post("http://localhost:8080/message-check", {
+      user_id: this.props.userId
     }).then(response => {
       if (response.data.length > 0) {
         //Assemble all data to render a message
