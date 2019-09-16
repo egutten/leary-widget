@@ -42,27 +42,35 @@ class Widget extends Component {
       });  
     }
     
-    //Assembling all data to render a message
-    axios.post("http://localhost:8080/message", {
-      user_id: this.props.userId
+    //check that there is adequate data in the system to form a message
+    axios.get("http://localhost:8080/message-check", {
     }).then(response => {
-      this.setState({
-        conversion_event_text: response.data.conversion_event,
-        logo: "//logo.clearbit.com/" + response.data.logo,
-        timestamp: response.data.timestamp
-      });
-      
-      //Record message logo that customer saw
-      axios.post("http://localhost:8080/customer-props", {
-        logo: response.data.logo,
-        customer_id: cookies.get('customer_id')
-      }).then(response => {
-        console.log(response);
-      }).catch(err => {
-        console.log(err);
-      })
-      
-      console.log(response);
+      if (response.data.length > 0) {
+        //Assemble all data to render a message
+        axios.post("http://localhost:8080/message", {
+          user_id: this.props.userId
+        }).then(response => {
+          this.setState({
+            conversion_event_text: response.data.conversion_event,
+            logo: "//logo.clearbit.com/" + response.data.logo,
+            timestamp: response.data.timestamp
+          });
+          
+          //Record message logo that customer saw
+          axios.post("http://localhost:8080/customer-props", {
+            logo: response.data.logo,
+            customer_id: cookies.get('customer_id')
+          }).then(response => {
+            console.log(response);
+          }).catch(err => {
+            console.log(err);
+          })
+          
+          console.log(response);
+        }).catch(err => {
+          console.log(err);
+        });  
+      }
     }).catch(err => {
       console.log(err);
     });
