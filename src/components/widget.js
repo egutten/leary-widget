@@ -14,13 +14,17 @@ class Widget extends Component {
   state = {
     show: "message-box hidden",
     conversion_event_text: null,
-    timestamp: null
+    timestamp: null,
+    logo: null
   }
   
   componentDidMount() {
     if (cookieJar === undefined) {
+      //Create customer on load
       axios.post("http://localhost:8080/customer",{
       }).then(response => {
+        
+        //Create customer-acvitity (visit) on load
         axios.post("http://localhost:8080/customer-activity",{
           user_id: this.props.userId,
           customer_id: response.data.id,
@@ -30,27 +34,48 @@ class Widget extends Component {
         }).catch(err => {
           console.log(err);
         });
+        
+        //Set cookie for customer
         cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
       }).catch(err => {
         console.log(err);
       });  
     }
     
-    axios.get("http://localhost:8080/conversion-event-id",{
+    //check that there is adequate data in the system to form a message
+    axios.get("http://localhost:8080/message-check", {
     }).then(response => {
-      this.setState({timestamp: response.data.timestamp});
-      
-      axios.post("http://localhost:8080/conversion-event-text",{
-        id: response.data.conversion_event_id
-      }).then(response => {
-       this.setState({conversion_event_text: response.data[0].conversion_event});
-      }).catch(err => {
-        console.log(err);
-      });
+      if (response.data.length > 0) {
+        //Assemble all data to render a message
+        axios.post("http://localhost:8080/message", {
+          user_id: this.props.userId
+        }).then(response => {
+          this.setState({
+            conversion_event_text: response.data.conversion_event,
+            logo: "//logo.clearbit.com/" + response.data.logo,
+            timestamp: response.data.timestamp
+          });
+          
+          //Record message logo that customer saw
+          axios.post("http://localhost:8080/customer-props", {
+            logo: response.data.logo,
+            customer_id: cookies.get('customer_id')
+          }).then(response => {
+            console.log(response);
+          }).catch(err => {
+            console.log(err);
+          })
+          
+          console.log(response);
+        }).catch(err => {
+          console.log(err);
+        });  
+      }
     }).catch(err => {
       console.log(err);
-    });  
+    });
     
+    //Set timeouts to make the message appear and disappear
     setTimeout(() => {
       this.setState({show: "message-box entering"});
     }, 2000)
@@ -66,7 +91,8 @@ class Widget extends Component {
       message = <Message 
         show = {this.state.show}
         conversionEvent = {this.state.conversion_event_text} 
-        timestamp = {this.state.timestamp} />;
+        timestamp = {this.state.timestamp}
+        logo = {this.state.logo} />;
     };
     
     return (
