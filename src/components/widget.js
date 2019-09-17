@@ -20,26 +20,18 @@ class Widget extends Component {
   
   componentDidMount() {
     if (cookieJar === undefined) {
-      //Create customer on load
-      axios.post("http://localhost:8080/customer",{
-      }).then(response => {
-        
+
         //Create customer-acvitity (visit) on load
         axios.post("http://localhost:8080/customer-activity",{
           user_id: this.props.userId,
-          customer_id: response.data.id,
           event: 'view'
         }).then(response => {
           console.log(response);
+          cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
         }).catch(err => {
           console.log(err);
         });
         
-        //Set cookie for customer
-        cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
-      }).catch(err => {
-        console.log(err);
-      });  
     }
     
     //check that there is adequate data in the system to form a message
@@ -58,14 +50,14 @@ class Widget extends Component {
           });
           
           //Record message logo that customer saw
-          axios.post("http://localhost:8080/customer-props", {
-            logo: response.data.logo,
-            customer_id: cookies.get('customer_id')
-          }).then(response => {
-            console.log(response);
-          }).catch(err => {
-            console.log(err);
-          })
+          // axios.post("http://localhost:8080/customer-props", {
+          //   logo: response.data.logo,
+          //   customer_id: cookies.get('customer_id')
+          // }).then(response => {
+          //   console.log(response);
+          // }).catch(err => {
+          //   console.log(err);
+          // })
           
           console.log(response);
         }).catch(err => {
