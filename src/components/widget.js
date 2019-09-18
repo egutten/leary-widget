@@ -20,50 +20,28 @@ class Widget extends Component {
   
   componentDidMount() {
     if (cookieJar === undefined) {
-
-        //Create customer-acvitity (visit) on load
-        axios.post("http://localhost:8080/customer-activity",{
-          user_id: this.props.userId,
-          event: 'view'
-        }).then(response => {
-          console.log(response);
-          cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
-        }).catch(err => {
-          console.log(err);
-        });
-        
+      //Create customer-acvitity (visit) on load
+      axios.post("http://localhost:8080/customer-activity",{
+        user_id: this.props.userId,
+        event: 'view'
+      }).then(response => {
+        console.log(response.data);
+        cookies.set('customer_id', response.data, {path: '/', expires: new Date(Date.now()+2592000)});
+      }).catch(err => {
+        console.log(err);
+      });    
     }
     
     //check that there is adequate data in the system to form a message
-    axios.post("http://localhost:8080/message-check", {
-      user_id: this.props.userId
+    axios.post("http://localhost:8080/messages", {
+      user_id: this.props.userId,
+      customer_id: cookies.get('customer_id')
     }).then(response => {
-      if (response.data.length > 0) {
-        //Assemble all data to render a message
-        axios.post("http://localhost:8080/message", {
-          user_id: this.props.userId
-        }).then(response => {
-          this.setState({
-            conversion_event_text: response.data.conversion_event,
-            logo: "//logo.clearbit.com/" + response.data.logo,
-            timestamp: response.data.timestamp
-          });
-          
-          //Record message logo that customer saw
-          // axios.post("http://localhost:8080/customer-props", {
-          //   logo: response.data.logo,
-          //   customer_id: cookies.get('customer_id')
-          // }).then(response => {
-          //   console.log(response);
-          // }).catch(err => {
-          //   console.log(err);
-          // })
-          
-          console.log(response);
-        }).catch(err => {
-          console.log(err);
-        });  
-      }
+      console.log(response)
+      this.setState({
+        conversion_event_text: response.data.conversion_event,
+        logo: "//logo.clearbit.com/" + response.data.logo,
+        timestamp: response.data.timestamp});
     }).catch(err => {
       console.log(err);
     });
