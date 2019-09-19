@@ -21,6 +21,7 @@ class Widget extends Component {
   
   componentDidMount() {
       var that = this;
+      
       function createCustomer() {
         return new Promise((resolve, reject) => {
           axios.post("http://localhost:8080/customer-activity",{
@@ -29,43 +30,56 @@ class Widget extends Component {
           }).then(response => {
             resolve(response);
           })
-        })
-      }
+        });
+      };
       
-      function setCustomerIdFromState() {
-        createCustomer().then((response) => {
+      function setCustomerIdFromState(response) {
+        return new Promise((resolve, reject) => {
           cookies.set('customer_id', response.data, {path: '/', expires: new Date(Date.now()+2592000)});
-          that.setState({customer_id: response.data}, () => 
+          that.setState({customer_id: response.data}, () => {
             axios.post("http://localhost:8080/messages", {
               user_id: that.props.userId,
               customer_id: that.state.customer_id
             }).then(response => {
-              that.setState({
-                conversion_event_text: response.data.conversion_event,
-                logo: "//logo.clearbit.com/" + response.data.logo,
-                timestamp: response.data.timestamp});
+              resolve(response);
             })
-          )
-        })
-      }
+          });  
+        });
+      };  
       
       function setCustomerIdFromCookie() {
-        axios.post("http://localhost:8080/messages", {
-          user_id: that.props.userId,
-          customer_id: cookies.get('customer_id')
-        }).then(response => {
-          that.setState({
-            conversion_event_text: response.data.conversion_event,
-            logo: "//logo.clearbit.com/" + response.data.logo,
-            timestamp: response.data.timestamp});
-        })
-      }
+        return new Promise((resolve, reject) => {
+          axios.post("http://localhost:8080/messages", {
+            user_id: that.props.userId,
+            customer_id: cookies.get('customer_id')
+          }).then(response => {
+            resolve(response)
+          });
+        });
+      };
+      
+      function setMessageDataToState(response) {
+        that.setState({
+          conversion_event_text: response.data.conversion_event,
+          logo: "//logo.clearbit.com/" + response.data.logo,
+          timestamp: response.data.timestamp
+        });
+      };
       
       if (cookieJar === undefined) {
-        setCustomerIdFromState();
+        createCustomer()
+        .then((response) => {
+          setCustomerIdFromState(response)
+          .then((response) => {
+            setMessageDataToState(response);
+          });
+        });
       } else {
-        setCustomerIdFromCookie();
-      }
+        setCustomerIdFromCookie()
+        .then((response) => {
+          setMessageDataToState(response);
+        });
+      };
 
     setTimeout(() => {
       this.setState({show: "message-box entering" + " " + this.props.position});
