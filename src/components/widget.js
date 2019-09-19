@@ -68,11 +68,11 @@ class Widget extends Component {
       }
 
     setTimeout(() => {
-      this.setState({show: "message-box entering"});
+      this.setState({show: "message-box entering" + " " + this.props.position});
     }, 2000)
     
     setTimeout(() => {
-      this.setState({show: "message-box exiting"});
+      this.setState({show: "message-box exiting" + " " + this.props.position});
     }, 6000);
   }  
   
@@ -95,11 +95,13 @@ class Widget extends Component {
 }
 
 Widget.propTypes = {
-  userId: PropTypes.number
+  userId: PropTypes.number,
+  position: PropTypes.string
 };
 
 Widget.defaultProps = {
   userId: 0,
+  position: null
 };
 
 export default Widget;
