@@ -45,3 +45,11 @@ export default class EmbeddableWidget {
     EmbeddableWidget.el = null;
   }
 }
+
+const attr = document.getElementById('123456').getAttribute('data-config');
+const config = JSON.parse(attr);
+
+EmbeddableWidget.mount({
+  userId: config[0].userId,
+  position: config[0].position
+});
