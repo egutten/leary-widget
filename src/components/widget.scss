@@ -30,7 +30,6 @@
 .message-box {
   position: fixed;
   bottom: 20px;
-  right: 40px;
   width: 300px;
   z-index: 9999;
   border: 1px solid #a0a3a1;
@@ -40,6 +39,14 @@
   justify-content: center;
   animation-fill-mode: forwards;
   animation-duration: 1s;
+}
+
+.right {
+  right: 50px
+}
+
+.left {
+  left: 50px
 }
 
 .hidden {

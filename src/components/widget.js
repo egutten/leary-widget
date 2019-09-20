@@ -15,76 +15,80 @@ class Widget extends Component {
     show: "message-box hidden",
     conversion_event_text: null,
     timestamp: null,
-    logo: null
+    logo: null,
+    customer_id: null
   }
   
   componentDidMount() {
-    if (cookieJar === undefined) {
-      //Create customer on load
-      axios.post("http://localhost:8080/customer",{
-      }).then(response => {
-        
-        //Create customer-acvitity (visit) on load
-        axios.post("http://localhost:8080/customer-activity",{
-          user_id: this.props.userId,
-          customer_id: response.data.id,
-          event: 'view'
-        }).then(response => {
-          console.log(response);
-        }).catch(err => {
-          console.log(err);
+      var that = this;
+      
+      function createCustomer() {
+        return new Promise((resolve, reject) => {
+          axios.post("http://localhost:8080/customer-activity",{
+            user_id: that.props.userId,
+            event: 'view'
+          }).then(response => {
+            resolve(response);
+          })
         });
-        
-        //Set cookie for customer
-        cookies.set('customer_id', response.data.id, {path: '/', expires: new Date(Date.now()+2592000)});
-      }).catch(err => {
-        console.log(err);
-      });  
-    }
-    
-    //check that there is adequate data in the system to form a message
-    axios.post("http://localhost:8080/message-check", {
-      user_id: this.props.userId
-    }).then(response => {
-      if (response.data.length > 0) {
-        //Assemble all data to render a message
-        axios.post("http://localhost:8080/message", {
-          user_id: this.props.userId
-        }).then(response => {
-          this.setState({
-            conversion_event_text: response.data.conversion_event,
-            logo: "//logo.clearbit.com/" + response.data.logo,
-            timestamp: response.data.timestamp
-          });
-          
-          //Record message logo that customer saw
-          axios.post("http://localhost:8080/customer-props", {
-            logo: response.data.logo,
+      };
+      
+      function setCustomerIdFromState(response) {
+        return new Promise((resolve, reject) => {
+          cookies.set('customer_id', response.data, {path: '/', expires: new Date(Date.now()+2592000)});
+          that.setState({customer_id: response.data}, () => {
+            axios.post("http://localhost:8080/messages", {
+              user_id: that.props.userId,
+              customer_id: that.state.customer_id
+            }).then(response => {
+              resolve(response);
+            })
+          });  
+        });
+      };  
+      
+      function setCustomerIdFromCookie() {
+        return new Promise((resolve, reject) => {
+          axios.post("http://localhost:8080/messages", {
+            user_id: that.props.userId,
             customer_id: cookies.get('customer_id')
           }).then(response => {
-            console.log(response);
-          }).catch(err => {
-            console.log(err);
-          })
-          
-          console.log(response);
-        }).catch(err => {
-          console.log(err);
-        });  
-      }
-    }).catch(err => {
-      console.log(err);
-    });
-    
-    //Set timeouts to make the message appear and disappear
+            resolve(response)
+          });
+        });
+      };
+      
+      function setMessageDataToState(response) {
+        that.setState({
+          conversion_event_text: response.data.conversion_event,
+          logo: "//logo.clearbit.com/" + response.data.logo,
+          timestamp: response.data.timestamp
+        });
+      };
+      
+      if (cookieJar === undefined) {
+        createCustomer()
+        .then((response) => {
+          setCustomerIdFromState(response)
+          .then((response) => {
+            setMessageDataToState(response);
+          });
+        });
+      } else {
+        setCustomerIdFromCookie()
+        .then((response) => {
+          setMessageDataToState(response);
+        });
+      };
+
     setTimeout(() => {
-      this.setState({show: "message-box entering"});
+      this.setState({show: "message-box entering" + " " + this.props.position});
     }, 2000)
     
     setTimeout(() => {
-      this.setState({show: "message-box exiting"});
+      this.setState({show: "message-box exiting" + " " + this.props.position});
     }, 6000);
-  };
+  }  
   
   render() {
     let message = null;
@@ -105,11 +109,13 @@ class Widget extends Component {
 }
 
 Widget.propTypes = {
-  userId: PropTypes.number
+  userId: PropTypes.number,
+  position: PropTypes.string
 };
 
 Widget.defaultProps = {
   userId: 0,
+  position: null
 };
 
 export default Widget;
