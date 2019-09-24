@@ -71,7 +71,7 @@ const defaultConfig = {
   },
   resolve: {
     extensions: ['*', '.js', '.jsx'],
-  },
+  }
 };
 
 module.exports = [{

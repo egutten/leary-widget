@@ -4,7 +4,6 @@ import './widget.scss';
 import axios from 'axios';
 import Cookies from 'universal-cookie';
 import Message from './Message.js';
-// import { createCustomer, setCookieToCustomerId, getMessages } from './../helpers/widget-helpers';
 
 const cookies = new Cookies();
 
