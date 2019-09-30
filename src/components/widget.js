@@ -8,7 +8,7 @@ const cookies = new Cookies();
 
 const cookieJar = cookies.get('customerId');
 
-const url = window.location.href.indexOf('localhost') ? 'http://localhost:8080/' : 'https://getleery.com';
+const url = window.location.href.indexOf('localhost') ? 'http://localhost:8080' : 'https://getleery.com';
 
 class Widget extends Component {
   state = {
@@ -23,7 +23,7 @@ class Widget extends Component {
   componentDidMount() {
     const that = this;
     function createCustomer() {
-      return axios.post(`${url}customer-activity`, {
+      return axios.post(`${url}/customer-activity`, {
         user_id: that.props.userId,
         event: 'view',
       }).then((response) => response);
@@ -32,7 +32,7 @@ class Widget extends Component {
       return new Promise((resolve) => {
         cookies.set('customerId', customer_id.data, { path: '/', expires: new Date(Date.now() + 2592000) });
         that.setState({ customer_id: customer_id.data }, () => {
-          axios.post(`${url}messages`, {
+          axios.post(`${url}/messages`, {
             user_id: that.props.userId,
             customer_id: that.state.customer_id,
           }).then((response) => {
@@ -42,9 +42,9 @@ class Widget extends Component {
       });
     }
     function setCustomerIdFromCookie() {
-      return axios.post(`${url}messages`, {
+      return axios.post(`${url}/messages`, {
         user_id: that.props.userId,
-        customer_id: cookies.get('customer_id'),
+        customer_id: cookieJar,
       }).then((response) => response);
     }
     function setMessageDataToState(message) {

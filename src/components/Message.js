@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const message = (props) => (
   <div className={props.show}>
     <div>
-      <img className="logo" alt="logo" src={props.logo} />
+      <img className="logo" alt="leery-logo" src={props.logo} />
     </div>
     <div className="text">
       <p className="event-text">{`${props.conversionEvent}!`}</p>
