@@ -51,5 +51,5 @@ const config = JSON.parse(attr);
 
 EmbeddableWidget.mount({
   userId: config.userId,
-  position: config.position
+  position: config.position,
 });
