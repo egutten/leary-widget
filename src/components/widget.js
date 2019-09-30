@@ -16,7 +16,6 @@ class Widget extends Component {
     conversion_event_text: null,
     timestamp: null,
     logo: null,
-    customer_id: null,
     position: null,
   }
   
@@ -28,24 +27,24 @@ class Widget extends Component {
         event: 'view',
       }).then((response) => response);
     }
-    function setCustomerIdFromState(customer_id) {
+    function getMessageData(customerId) {
+      return axios.post(`${url}/messages`, {
+        user_id: that.props.userId,
+        customer_id: customerId,
+      });
+    }
+    function setCustomerIdFromDatabase(customerId) {
       return new Promise((resolve) => {
-        cookies.set('customerId', customer_id.data, { path: '/', expires: new Date(Date.now() + 2592000) });
-        that.setState({ customer_id: customer_id.data }, () => {
-          axios.post(`${url}/messages`, {
-            user_id: that.props.userId,
-            customer_id: that.state.customer_id,
-          }).then((response) => {
+        cookies.set('customerId', customerId.data, { path: '/', expires: new Date(Date.now() + 2592000) });
+        getMessageData(customerId.data)
+          .then((response) => { 
             resolve(response);
           });
-        });
       });
     }
     function setCustomerIdFromCookie() {
-      return axios.post(`${url}/messages`, {
-        user_id: that.props.userId,
-        customer_id: cookieJar,
-      }).then((response) => response);
+      return getMessageData(cookieJar)
+        .then((response) => response);
     }
     function setMessageDataToState(message) {
       that.setState({
@@ -57,8 +56,8 @@ class Widget extends Component {
     }
     if (cookieJar === undefined) {
       createCustomer()
-       .then((customer_id) => {
-          setCustomerIdFromState(customer_id)
+        .then((customerId) => {
+          setCustomerIdFromDatabase(customerId)
             .then((message) => {
               setMessageDataToState(message);
             });
