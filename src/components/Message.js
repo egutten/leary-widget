@@ -4,11 +4,11 @@ import PropTypes from 'prop-types';
 const message = (props) => (
   <div className={props.show}>
     <div>
-      <img className="logo" alt="leery-logo" src={props.logo} />
+      <img className="leery-logo" alt="leery-logo" src={props.logo} />
     </div>
-    <div className="text">
-      <p className="event-text">{`${props.conversionEvent}!`}</p>
-      <p className="time-stamp">{props.timestamp}</p>
+    <div className="leery-text">
+      <p className="leery-event-text">{`${props.conversionEvent}`}</p>
+      <p className="leery-time-stamp">{props.timestamp}</p>
     </div>
   </div>
 );

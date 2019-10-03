@@ -12,7 +12,7 @@ const url = window.location.href.indexOf('localhost') ? 'http://localhost:8080' 
 
 class Widget extends Component {
   state = {
-    show: 'message-box hidden',
+    show: 'leery-message-box leery-hidden',
     conversion_event_text: null,
     timestamp: null,
     logo: null,
@@ -69,10 +69,10 @@ class Widget extends Component {
         });
     }
     setTimeout(() => {
-      this.setState({ show: `message-box entering ${this.state.position}` });
+      this.setState({ show: `leery-message-box leery-entering leery-${this.state.position}` });
     }, 2000);
     setTimeout(() => {
-      this.setState({ show: `message-box exiting ${this.state.position}` });
+      this.setState({ show: `leery-message-box leery-exiting leery-${this.state.position}` });
     }, 6000);
   }
   
