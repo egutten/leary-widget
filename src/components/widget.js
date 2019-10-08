@@ -8,7 +8,7 @@ const cookies = new Cookies();
 
 const cookieJar = cookies.get('customerId');
 
-const url = window.location.href.indexOf('localhost') ? 'http://localhost:8080' : 'https://getleery.com';
+const url = window.location.href.indexOf('localhost') ? 'http://localhost:8080' : 'api.getleery.com';
 
 class Widget extends Component {
   state = {
