@@ -120,5 +120,11 @@
     "react-dom": "^16.9.0",
     "react-transition-group": "^4.3.0",
     "universal-cookie": "^4.0.2"
-  }
+  },
+  "proxy": {
+      "/api": {
+        "target": "http://api.getleery.com",
+        "changeOrigin": true
+      }
+    }
 }
