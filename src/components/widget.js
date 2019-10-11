@@ -8,7 +8,7 @@ const cookies = new Cookies();
 
 const cookieJar = cookies.get('customerId');
 
-const url = 'http://api.getleery.com';
+const url = 'https://api.getleery.com';
 
 class Widget extends Component {
   state = {
@@ -25,7 +25,8 @@ class Widget extends Component {
       return axios.post(`${url}/customer-activity`, {
         user_id: that.props.userId,
         event: 'view',
-      }).then((response) => response);
+      }
+    ).then((response) => response);
     }
     function getMessageData(customerId) {
       return axios.post(`${url}/messages`, {
